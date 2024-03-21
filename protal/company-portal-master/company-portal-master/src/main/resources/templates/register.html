@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>用户注册</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4caf50;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .error-message {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<form id="registrationForm" onsubmit="return submitForm()">
+    <label for="username">用户名:</label>
+    <input type="text" id="username" name="username" required>
+
+    <label for="password">密码:</label>
+    <input type="password" id="password" name="password" required>
+
+    <label for="confirmPassword">确认密码:</label>
+    <input type="password" id="confirmPassword" name="confirmPassword" required>
+
+    <label for="number">手机:</label>
+    <input type="text" id="number" name="number" required>
+
+    <button type="submit">注册</button>
+    <p class="error-message" id="errorMessage"></p>
+</form>
+
+<script>
+    function submitForm() {
+        document.getElementById('errorMessage').innerText = '';
+
+        var username = document.getElementById('username').value;
+        var password = document.getElementById('password').value;
+        var confirmPassword = document.getElementById('confirmPassword').value;
+        var number = document.getElementById('number').value;
+
+        if (password !== confirmPassword) {
+            document.getElementById('errorMessage').innerText = '密码和确认密码必须匹配。';
+            return false;
+        }
+
+        // 构造发送到后端的数据
+        var formData = new FormData();
+        formData.append('username', username);
+        formData.append('password', password);
+        formData.append('number', number);
+
+        // 使用 fetch 发送注册请求
+        fetch('/register', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                if (data.code === 0) {
+                    alert('注册成功！');
+                    window.location.href = '/login';
+                } else {
+                    document.getElementById('errorMessage').innerText = data.msg;
+                }
+            })
+            .catch(error => {
+                console.error('Error during registration:', error);
+                document.getElementById('errorMessage').innerText = '注册失败，请稍后再试。';
+            });
+
+        return false; // 阻止表单默认的提交行为
+    }
+</script>
+</body>
+</html>
